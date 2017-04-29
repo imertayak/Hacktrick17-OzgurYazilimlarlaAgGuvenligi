@@ -1,0 +1,41 @@
+#! /bin/bash
+#IPTABLES Exercise
+
+#1. SSH DROP
+#----------------------
+#iptables -A INPUT -p tcp --dport 22 -s 10.10.20.0/24 -j DROP
+
+#2. Kaynak IP DROP
+#-----------------------
+#iptables -A INPUT -s 10.10.20.128 -j DROP
+
+#3. Hersey DROP sadece belirli bir subnet'e ssh ACCEPT
+#------------------------
+#iptables -P INPUT DROP
+#iptables -P OUTPUT DROP
+#iptables -P FORWARD DROP
+#iptables -A INPUT -i lo -j ACCEPT
+#iptables -A OUTPUT -o lo -j ACCEPT
+#iptables -A INPUT -i eth1 -p tcp -s 10.10.30.0/24 --dport 22 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+#iptables -A OUTPUT -o eth1 -p tcp -d 10.10.30.0/24 --sport 22 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#4. Hersey DROP sadece 80 ve 443 Portu ACCEPT
+#--------------------------
+#iptables -P INPUT DROP
+#iptables -P OUTPUT DROP
+#iptables -P FORWARD DROP
+#iptables -A INPUT -i lo -j ACCEPT
+#iptables -A OUTPUT -o lo -j ACCEPT
+#iptables -A INPUT -p tcp -m multiport --dports 80,443 -m state --state NEW,ESTABLISHED -j ACCEPT
+#iptables -A OUTPUT -p tcp -m multiport --sports 80,443 -m state --state ESTABLISHED -j ACCEPT
+
+
+#5. Ping DROP ve Drop Log'u
+#---------------------------
+#iptables -N LOGGING
+#iptables -A INPUT -j LOGGING
+#iptables -A LOGGING -p icmp -m limit --limit 2/min -j LOG --log-prefix "DROPPED PING REQ: " --log-level 4
+#iptables -A LOGGING -p icmp -s 0/0 --icmp-type echo-request -j DROP
+
+
+

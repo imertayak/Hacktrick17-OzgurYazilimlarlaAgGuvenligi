@@ -1,0 +1,21 @@
+uncomment local.rules and black_list.rules
+
+
+1.UDP Traffic Detection:
+(local.rules)
+alert udp $EXTERNAL_NET any -> $HOME_NET any (msg:"UDP TRAFFIC DETECTED"; sid:10001;)
+
+2.NMAP Ping Sweep Detection:
+(local.rules)
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"ICMP PING NMAP"; dsize:0; itype:8; reference:arachnids,162; classtype:attempted-recon; sid:469; rev:3;)
+
+3.Block SSH Access:
+reject tcp $EXTERNAL_NET any -> $HOME_NET 22 (msg:"SSH Conn. Rejected"; sid:10013; rev:5;)
+
+4.NMAP Scan Detection:
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"SYN SCAN DETECTED"; flow:stateless; flags:S,12; classtype:attempted-recon; sid:10004; rev:6;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"TCP SCAN DETECTED"; detection_filter:track by_src, count 30, seconds 60; classtype:attempted-recon; sid:10006; rev:7;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"XMAS SCAN DETECTED"; flow:stateless; flags:FPU,12; classtype:attempted-recon; sid:10005; rev:8;)
+
+
+

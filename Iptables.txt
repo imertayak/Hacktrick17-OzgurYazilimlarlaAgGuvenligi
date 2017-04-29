@@ -1,0 +1,52 @@
+IPTABLES
+
+Iptables linux kernel'ında standart olan netfilter firewall uygulamasının kullanıcı arayüzüdür.
+
+Iptables -L --> Iptables kurallarını göstermek için kullanılan komut.
+
+Iptables Chain (Zincir) Yapısı:
+
+Default Chainler --> INPUT, OUTPUT ve FORWARD
+
+Yeni Chain eklemek için -N <chain name>
+
+Kullanıcının oluşturduğu Chainleri temizlemek için -X
+
+Target'lar:
+
+ACCEPT --> Paketin geçmesine izin verir.
+DROP --> Paketin kurala uygun değilse yok olmasını sağlar.
+REJECT --> DROP dan farkı paketi yok ederken istemciye'de haber verir.
+
+DROP TEHLİKELİ!! DDoS Mitigation yoksa router arkasındaki paketleri DROP'layarak routing table'ın
+overload olmasına neden olabilir.
+
+Match --> paket headerlarına bakarak belirli kurallara uyup uymadığına karar verir. -m <match_rule> --match_rule
+
+-A (Append)
+
+-D (Delete)
+
+-F (Flush)
+
+-X (delete user chains)
+
+-P <policy/default chains>
+
+State Matching:
+
+-	NEW --> Yeni bağlantı açılması (SYN received)
+-	ESTABLISHED --> Bağlantının kabul edilmesi (SYN-ACK returned)
+-	INVALID --> Tanımsız paketin gelmesi durumu
+-	UNTRACKED --> State'in izlenmemesi
+
+Diğer Parametreler:
+
+-p protocol
+-s source
+-d destination
+-i input interface
+-o output interface
+--sport source port
+--dport dest. port
+--tcp-flags (SYN,ACK,FIN,...)
