@@ -1,0 +1,89 @@
+Powershell ile Log Analizi: 
+
+Get-Help Get-EventLog
+Get-EventLog –list
+Get-eventlog security -after(get-date).AddHours(-10)
+Get-EventLog security -Newest 10
+Get-Eventlog system -Newest 5000 | Where-Object {$_.entryType -Match "Error"}
+Get-eventlog security | export-csv -path system.csv
+Get-EventLog security -Newest 10 | Export-Csv -path security_latest10.csv
+
+
+cat /var/log/apache2/error.log | awk -F" " '{print $10}' | tr "]" "  " | grep ':'
+
+
+
+cat /var/log/apache2/error.log | awk -F" " '{print $10}' | tr "]" " " | grep ':' | cut -d":" -f1 | sort -u | wc
+wq
+
+
+Apache Error Log Dosyası istatistikleri 
+
+grep client error.log | cut -d" " -f10 | cut -d: -f1 | grep 192 | sort -nr | uniq -c | sort -nr
+  14250 192.168.10.25
+    147 192.168.10.36
+     11 192.168.10.29
+      6 192.168.10.37
+      3 192.168.10.39
+      3 192.168.10.26
+      2 192.168.10.23
+      1 192.168.10.40
+      1 192.168.10.27
+
+
+
+Apache Access Log Dosyası: 
+192.168.10.43 - - [30/Apr/2017:12:30:16 +0300] "GET /access.log HTTP/1.1" 304 184 "-" "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36"
+
+User Agent: 
+Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36
+
+
+
+
+Apache Access Logu istatistikleri: 
+
+cat access.log | cut -d\" -f6 | sort -nr | grep -v Nikto |uniq -c | sort -nr
+
+
+root@victim:/var/log/apache2# cat access.log | cut -d\" -f6 | sort -nr | grep -v Nikto |uniq -c | sort -nr
+  20212 -
+    140 Apache/2.4.25 (Debian) (internal dummy connection)
+    139 Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0
+     87 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36
+     36 Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0
+     35 Mozilla/5.0 (X11; Linux x86_64; rv:53.0) Gecko/20100101 Firefox/53.0
+     35 Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36
+     34 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12
+     34  
+     30 Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36
+     24 Wget/1.18 (linux-gnu)
+     23 Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36 OPR/44.0.2510.1218
+     22 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36
+     20 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36 OPR/43.0.2442.1165
+     17 Mozilla/5.0 (Windows NT 6.3; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0
+     16 python-requests/2.12.1
+     16 Mozilla/5.0 (X11; Linux x86_64; rv:43.0) Gecko/20100101 Firefox/43.0 Iceweasel/43.0.4
+     13 Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/58.0.3029.81 Chrome/58.0.3029.81 Safari/537.36
+      9 Mozilla/5.0 (X11; Linux i686; rv:45.0) Gecko/20100101 Firefox/45.0
+      6 Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36
+      6 Mozilla/5.0 (Linux; Android 7.0; SM-G930F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.83 Mobile Safari/537.36
+      5 Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36
+      3 )</script> HTTP/1.1
+      2 Wget/1.17.1 (linux-gnu)
+      1 python-requests/2.13.0
+      1  404 567 
+
+
+
+Merkezi Syslog Sunucu 
+
+vi /etc/syslog.conf 
+
+yeni satir ekle: 
+auth,authpriv.*			@192.168.10.22
+
+
+:wq 
+
+/etc/init.d/sysklogd restart 
